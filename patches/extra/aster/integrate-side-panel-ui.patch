@@ -78,7 +78,7 @@
    const bool is_force_to_top =
        has_side_panel &&
        layout_data_->horizontal_layout.force_top_container_to_top;
-@@ -226,6 +230,10 @@ BrowserViewTabbedLayoutImpl::CalculateSe
+@@ -226,6 +229,10 @@ BrowserViewTabbedLayoutImpl::CalculateSe
        break;
    }
  
