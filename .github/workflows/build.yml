@@ -43,4 +43,4 @@ jobs:
         if: ${{ always() }}
         run: |
           podman image rm --force "$IMAGE" || true
-          git clean -ffdx
+          podman unshare git clean -ffdx
