@@ -1,0 +1,46 @@
+name: Build Aster Chromium
+
+on:
+  workflow_run:
+    workflows:
+      - Code Validation
+    types:
+      - completed
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    if: >-
+      ${{ github.event.workflow_run.conclusion == 'success' &&
+          github.event.workflow_run.event == 'push' }}
+    runs-on: self-hosted
+    timeout-minutes: 1440
+    env:
+      ENGINE: podman
+      IMAGE: localhost/aster-builder:${{ github.run_id }}-${{ github.run_attempt }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Build RPM
+        run: ./build.sh
+
+      - name: Upload RPM
+        uses: actions/upload-artifact@v4
+        with:
+          name: aster-rpm-${{ github.event.workflow_run.head_sha }}
+          path: aster-*.rpm
+          if-no-files-found: error
+
+      - name: Clean up runner
+        if: ${{ always() }}
+        run: |
+          podman image rm --force "$IMAGE" || true
+          git clean -ffdx
