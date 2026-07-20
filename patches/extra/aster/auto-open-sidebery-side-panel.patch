@@ -1,0 +1,52 @@
+--- a/chrome/browser/ui/views/side_panel/extensions/extension_side_panel_coordinator.cc
++++ b/chrome/browser/ui/views/side_panel/extensions/extension_side_panel_coordinator.cc
+@@ -4,6 +4,9 @@
+ 
+ #include "chrome/browser/ui/views/side_panel/extensions/extension_side_panel_coordinator.h"
+ 
++#include "base/functional/bind.h"
++#include "base/location.h"
++#include "base/task/single_thread_task_runner.h"
+ #include "base/strings/utf_string_conversions.h"
+ #include "chrome/browser/extensions/extension_tab_util.h"
+ #include "chrome/browser/extensions/extension_view_host_factory.h"
+@@ -240,6 +243,25 @@ void ExtensionSidePanelCoordinator::Crea
+ 
+   scoped_entry_observation_.Observe(entry.get());
+   registry_->Register(std::move(entry));
++
++  // aster: Auto-open the bundled Sidebery vertical-tabs extension
++  // in the window's side panel on startup. Only do this for the window-global
++  // coordinator (`browser_` is set) so it opens once per window, and defer via
++  // a posted task so the side panel UI is not shown mid-initialization.
++  if (browser_ &&
++      extension_->id() == "dcmmcmgcedhnmcabgkkbfdnjiebgafoa") {
++    base::SingleThreadTaskRunner::GetCurrentDefault()->PostTask(
++        FROM_HERE,
++        base::BindOnce(
++            &ExtensionSidePanelCoordinator::AutoOpenUngoogledSidePanel,
++            weak_factory_.GetWeakPtr()));
++  }
++}
++
++void ExtensionSidePanelCoordinator::AutoOpenUngoogledSidePanel() {
++  if (auto* side_panel_ui = SidePanelUI::From(browser_)) {
++    side_panel_ui->Show(GetEntryKey());
++  }
+ }
+ 
+ std::unique_ptr<views::View> ExtensionSidePanelCoordinator::CreateView(
+--- a/chrome/browser/ui/views/side_panel/extensions/extension_side_panel_coordinator.h
++++ b/chrome/browser/ui/views/side_panel/extensions/extension_side_panel_coordinator.h
+@@ -99,6 +99,11 @@ class ExtensionSidePanelCoordinator : pu
+   // the entry.
+   void CreateAndRegisterEntry();
+ 
++  // aster: Opens this extension's global side panel entry. Posted
++  // as a task from CreateAndRegisterEntry() to auto-open the bundled Sidebery
++  // vertical-tabs panel on startup.
++  void AutoOpenUngoogledSidePanel();
++
+   // Creates a view for the extension's resource URL. This is called when this
+   // extension's SidePanelEntry is about to be shown in the side panel and a
+   // view for the entry has not been cached.

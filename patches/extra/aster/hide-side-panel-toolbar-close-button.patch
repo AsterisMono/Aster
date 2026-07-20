@@ -1,0 +1,23 @@
+--- a/chrome/browser/ui/views/extensions/extensions_toolbar_desktop.cc
++++ b/chrome/browser/ui/views/extensions/extensions_toolbar_desktop.cc
+@@ -1046,14 +1046,12 @@ void ExtensionsToolbarDesktop::OnMenuClo
+   UpdateContainerVisibility();
+ }
+ 
+-void ExtensionsToolbarDesktop::UpdateSidePanelState(bool is_active) {
+-  close_side_panel_button_->SetVisible(is_active);
+-  if (is_active) {
+-    close_side_panel_button_anchor_highlight_ =
+-        close_side_panel_button_->AddAnchorHighlight();
+-  } else {
+-    close_side_panel_button_anchor_highlight_.reset();
+-  }
++void ExtensionsToolbarDesktop::UpdateSidePanelState(bool) {
++  // aster: Sidebery is intended to stay open, so its persistent,
++  // highlighted close button in the extensions toolbar is only a distraction.
++  // Keep the view for lifecycle compatibility, but never expose it.
++  close_side_panel_button_->SetVisible(false);
++  close_side_panel_button_anchor_highlight_.reset();
+ }
+ 
+ void ExtensionsToolbarDesktop::MovePinnedAction(

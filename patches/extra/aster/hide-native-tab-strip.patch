@@ -1,0 +1,20 @@
+--- a/chrome/browser/ui/views/frame/browser_view.cc
++++ b/chrome/browser/ui/views/frame/browser_view.cc
+@@ -1359,7 +1359,16 @@ bool BrowserView::ShouldDrawTabStrip() c
+   // since callers may otherwise try to access it. Note that we can't just check
+   // this alone, as the tabstrip is created unconditionally even for windows
+   // that won't display it.
+-  return horizontal_tab_strip_region_view_->tab_strip() != nullptr;
++  if (horizontal_tab_strip_region_view_->tab_strip() == nullptr) {
++    return false;
++  }
++
++  // aster: Never draw the native horizontal tab strip. A vertical
++  // tabs extension hosted in the side panel manages tabs instead. The tabstrip
++  // view is still created, and the TabStripModel and all tab logic remain
++  // intact; only the on-screen tab strip is removed, which collapses the tab
++  // strip region to zero height.
++  return false;
+ }
+ 
+ bool BrowserView::ShouldDrawVerticalTabStrip() const {

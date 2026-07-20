@@ -1,0 +1,91 @@
+--- a/chrome/browser/ui/side_panel/side_panel_prefs.cc
++++ b/chrome/browser/ui/side_panel/side_panel_prefs.cc
+@@ -29,8 +29,10 @@ void RegisterProfilePrefs(user_prefs::Pr
+   // Otherwise, the side panel should default to the right side of the screen.
+   // TODO(dljames): Add enum values kAlternateSide / kDefaultSide that will
+   // replace false and true respectively.
++  // aster: Default the side panel to the left so the vertical tabs
++  // extension docks on the left like a traditional sidebar.
+   registry->RegisterBooleanPref(prefs::kSidePanelHorizontalAlignment,
+-                                !base::i18n::IsRTL());
++                                base::i18n::IsRTL());
+   registry->RegisterBooleanPref(prefs::kGoogleSearchSidePanelEnabled, true);
+   registry->RegisterDictionaryPref(prefs::kSidePanelIdToWidth);
+ 
+--- a/chrome/browser/ui/views/side_panel/side_panel.cc
++++ b/chrome/browser/ui/views/side_panel/side_panel.cc
+@@ -81,9 +81,10 @@ constexpr int kOverlapFromToolbar = 4;
+ // bookmarks bar) itself. Subtract both of those to not get visually-excessive
+ // padding.
+ gfx::Insets GetBorderInsets() {
+-  int border_thickness = GetBorderThickness();
+-  return gfx::Insets::TLBR(-kOverlapFromToolbar, border_thickness,
+-                           border_thickness, border_thickness);
++  // aster: Render the side panel edge-to-edge so a vertical tabs
++  // extension integrates seamlessly with the browser frame and page, with no
++  // border padding or gap around it.
++  return gfx::Insets();
+ }
+ 
+ SidePanel::HorizontalAlignment GetHorizontalAlignment(
+@@ -218,12 +219,9 @@ class ContentParentView : public views::
+   }
+ 
+   gfx::RoundedCornersF GetRoundedCorners() {
+-    ChromeDistanceMetric corner_radius =
+-        ChromeDistanceMetric::DISTANCE_SIDE_PANEL_CONTENT_RADIUS;
+-    return GetLayoutProvider()
+-               ? gfx::RoundedCornersF(
+-                     GetLayoutProvider()->GetDistanceMetric(corner_radius))
+-               : gfx::RoundedCornersF();
++    // aster: No rounded corners on the side panel content so the
++    // hosted vertical tabs extension sits flush against the browser frame.
++    return gfx::RoundedCornersF();
+   }
+ 
+   const raw_ptr<BrowserView> browser_view_;
+--- a/chrome/browser/ui/views/side_panel/side_panel_coordinator.cc
++++ b/chrome/browser/ui/views/side_panel/side_panel_coordinator.cc
+@@ -261,13 +261,10 @@ void SidePanelCoordinator::PopulateSideP
+ 
+   side_panel->UpdateHorizontalAlignment(entry->key().id());
+ 
+-  if (entry->should_show_header()) {
+-    side_panel->AddHeaderView(std::make_unique<SidePanelHeader>(
+-        std::make_unique<SidePanelHeaderController>(
+-            &*browser_, side_panel_toolbar_pinning_controller_.get(), entry)));
+-  } else {
+-    side_panel->RemoveHeaderView();
+-  }
++  // aster: Never show the side panel header/titlebar (the panel
++  // switcher combobox and close button) so the hosted vertical tabs extension
++  // looks like a native part of the browser.
++  side_panel->RemoveHeaderView();
+   auto* content_wrapper = side_panel->GetContentParentView();
+   DCHECK(content_wrapper);
+   // |content_wrapper| should have either no child views or one child view for
+--- a/chrome/browser/ui/views/frame/layout/browser_view_tabbed_layout_impl.cc
++++ b/chrome/browser/ui/views/frame/layout/browser_view_tabbed_layout_impl.cc
+@@ -185,7 +185,10 @@ BrowserViewTabbedLayoutImpl::SeparatorIn
+ BrowserViewTabbedLayoutImpl::CalculateSeparatorInfo() const {
+   SeparatorInfo info;
+ 
+-  const bool has_side_panel = layout_data_->horizontal_layout.has_side_panel();
++  // aster: Do not treat the always-open vertical-tabs panel as a
++  // floating surface. The floating treatment adds a rounded shadow frame and
++  // theme-colored insets around the toolbar and web contents.
++  const bool has_side_panel = false;
+   const bool is_force_to_top =
+       has_side_panel &&
+       layout_data_->horizontal_layout.force_top_container_to_top;
+@@ -226,6 +230,10 @@ BrowserViewTabbedLayoutImpl::CalculateSe
+       break;
+   }
+ 
++  // aster: Keep the side panel flush with the top of its layout
++  // area even though it is excluded from the floating-surface treatment.
++  info.side_panel_top_padding = false;
++
+   return info;
+ }
+ 
