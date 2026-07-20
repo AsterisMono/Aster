@@ -1,0 +1,4 @@
+# Keep the multi-GB source tree / caches out of the Docker build context.
+build/
+.git/
+*.rpm

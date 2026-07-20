@@ -108,3 +108,13 @@ extra/ungoogled-chromium/disable-ai-search-shortcuts.patch
 extra/ungoogled-chromium/disable-fedcm-by-default.patch
 extra/ungoogled-chromium/bundle-hyphenation-patterns.patch
 extra/ungoogled-chromium/add-flag-for-disabling-jit.patch
+extra/aster/always-restore-session-after-crash.patch
+extra/aster/hide-native-tab-strip.patch
+extra/aster/integrate-side-panel-ui.patch
+extra/aster/hide-side-panel-toolbar-close-button.patch
+extra/aster/restore-side-panel-edge-resizing.patch
+extra/helium/add-component-l10n-support.patch
+extra/helium/add-component-managed-schema-support.patch
+extra/helium/fix-empty-component-resource.patch
+extra/aster/bundle-component-extensions.patch
+extra/aster/auto-open-sidebery-side-panel.patch

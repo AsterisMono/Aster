@@ -1,0 +1,35 @@
+--- a/chrome/browser/ui/startup/infobar_utils.cc
++++ b/chrome/browser/ui/startup/infobar_utils.cc
+@@ -146,9 +146,11 @@ void AddInfoBarsIfNecessary(BrowserWindo
+   }
+ 
+   // Web apps should not display the session restore bubble (crbug.com/40800614)
++  // aster: Respect the caller's post-crash determination so the
++  // bubble is suppressed when the previous session is being auto-restored.
+   const bool should_display_bubble =
+       !startup_command_line.HasSwitch("hide-crashed-bubble") &&
+-      !is_web_app && HasPendingUncleanExit(browser->GetProfile());
++      !is_web_app && is_post_crash_launch;
+   base::UmaHistogramBoolean("Startup.CrashBubbleShown", should_display_bubble);
+   if (should_display_bubble) {
+     SessionCrashedBubble::ShowIfNotOffTheRecordProfile(
+--- a/chrome/browser/ui/startup/startup_browser_creator_impl.cc
++++ b/chrome/browser/ui/startup/startup_browser_creator_impl.cc
+@@ -457,6 +457,17 @@ void StartupBrowserCreatorImpl::Determin
+   const bool is_incognito_or_guest = profile_->IsOffTheRecord();
+   bool is_post_crash_launch = HasPendingUncleanExit(profile_);
+ 
++  // aster: When the user has chosen to continue where they left
++  // off, always restore the previous session even after an unclean/crashed
++  // exit, instead of opening a blank window with the "Restore pages?" bubble
++  // that is easy to miss. This trades off the crash-loop protection that
++  // Chromium normally provides in this situation.
++  if (is_post_crash_launch &&
++      StartupBrowserCreator::GetSessionStartupPref(*command_line_, profile_)
++          .ShouldRestoreLastSession()) {
++    is_post_crash_launch = false;
++  }
++
+   // Defer adding info bars until the browser window is ready. The observer
+   // will delete itself once the infobars are added.
+   // It is safe to store Profile* in the callback as callback will be destroyed

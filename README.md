@@ -1,3 +1,12 @@
+# Aster
+
+> [!NOTE]
+> **Aster** is a [Noa-flavored](https://github.com/AsterisMono) ungoogled-chromium build with always-on vertical tabs
+> powered by bundled [Sidebery](https://github.com/AsterisMono/sidebery), bundled uBlock Origin, and reliable session
+> restoration after crashes.
+> 
+> License changed to GPLv3 due to patches taken from [Helium](https://github.com/imputnet/helium). love :3
+
 # ungoogled-chromium
 
 *A lightweight approach to removing Google web service dependency*
