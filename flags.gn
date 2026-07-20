@@ -11,6 +11,7 @@ exclude_unwind_tables=true
 google_api_key=""
 google_default_client_id=""
 google_default_client_secret=""
+is_official_build=true
 safe_browsing_mode=0
 treat_warnings_as_errors=false
 use_official_google_api_keys=false
