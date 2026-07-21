@@ -269,10 +269,11 @@ log "Building Chromium runtime (JOBS=$JOBS)"
   chrome \
   chrome_sandbox \
   chrome_crashpad_handler \
-  chrome_management_service)
+  chrome_management_service \
+  chrome/installer/linux:common_packaging_files)
 
 for required in chrome chrome_crashpad_handler chrome_management_service chrome_sandbox \
-                resources.pak icudtl.dat; do
+                resources.pak icudtl.dat installer/common/desktop.template; do
   [ -e "$SRC/$OUT/$required" ] || die "Ninja completed without $OUT/$required"
 done
 [ -f "$SRC/$OUT/locales/en-US.pak" ] || die "Ninja completed without the en-US locale"
