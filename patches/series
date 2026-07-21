@@ -113,6 +113,7 @@ extra/aster/hide-native-tab-strip.patch
 extra/aster/integrate-side-panel-ui.patch
 extra/aster/hide-side-panel-toolbar-close-button.patch
 extra/aster/restore-side-panel-edge-resizing.patch
+extra/aster/reduce-side-panel-minimum-width.patch
 extra/helium/add-component-l10n-support.patch
 extra/helium/add-component-managed-schema-support.patch
 extra/helium/fix-empty-component-resource.patch

@@ -1,0 +1,13 @@
+--- a/chrome/browser/ui/side_panel/side_panel_entry.h
++++ b/chrome/browser/ui/side_panel/side_panel_entry.h
+@@ -34,7 +34,9 @@ class SidePanelEntry final : public ui::
+  public:
+ 
+   // The default and minimum acceptable side panel content width.
+-  static constexpr int kSidePanelDefaultContentWidth = 360;
++  // aster: Allow the always-open vertical-tabs sidebar to be narrowed while
++  // retaining enough room for Sidebery's compact tab UI.
++  static constexpr int kSidePanelDefaultContentWidth = 240;
+   using CreateContentCallback =
+       base::RepeatingCallback<SidePanelNativeView(SidePanelEntryScope&)>;
+   using Id = SidePanelEntryId;
