@@ -103,6 +103,13 @@ for directory in default_apps WidevineCdm; do
   copy_optional "$directory"
 done
 
+EXTENSION_POLICY_SOURCE="$REPO_ROOT/assets/aster/policies/managed/aster-extensions.json"
+[ -f "$EXTENSION_POLICY_SOURCE" ] \
+  || die "required extension policy is missing: $EXTENSION_POLICY_SOURCE"
+mkdir -p "$STAGE/etc/aster/policies/managed"
+cp "$EXTENSION_POLICY_SOURCE" \
+  "$STAGE/etc/aster/policies/managed/aster-extensions.json"
+
 chmod 4755 "$DEST/chrome-sandbox"
 
 mkdir -p "$STAGE/usr/bin" \
@@ -159,7 +166,8 @@ Requires:       libnss3.so(NSS_3.39)(64bit)
 
 %description
 Aster is an ungoogled Chromium build with a bundled Sidebery vertical
-tab panel, bundled uBlock Origin, and Noa selected patches.
+tab panel, bundled uBlock Origin, policy-installed companion extensions,
+and patches curated by Noa.
 
 %install
 mkdir -p %{buildroot}
@@ -171,6 +179,7 @@ $PREFIX
 /usr/bin/$PKG_NAME
 /usr/share/applications/$PKG_NAME.desktop
 /usr/share/icons/hicolor/*/apps/$PKG_NAME.png
+/etc/aster/policies/managed/aster-extensions.json
 EOF
 
 cat >> "$SPEC" <<EOF

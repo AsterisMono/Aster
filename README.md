@@ -2,8 +2,8 @@
 
 > [!NOTE]
 > **Aster** is a [Noa-flavored](https://github.com/AsterisMono) ungoogled-chromium build with always-on vertical tabs
-> powered by bundled [Sidebery](https://github.com/AsterisMono/sidebery), bundled uBlock Origin, and reliable session
-> restoration after crashes.
+> powered by bundled [Sidebery](https://github.com/AsterisMono/sidebery), bundled uBlock Origin, a curated set of
+> policy-installed extensions, and reliable session restoration after crashes.
 > 
 > License changed to GPLv3 due to patches taken from [Helium](https://github.com/imputnet/helium). love :3
 
