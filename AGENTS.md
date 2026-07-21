@@ -24,6 +24,11 @@ general-purpose distribution.
    ungoogled-chromium's philosophy.
 5. **Everything above is hardcoded on.** No `chrome://flags`, no switches. This is
    a personal build with one intended configuration, not a general feature toggle.
+6. **Install the rest of the extension set on first launch.** Chromium Web Store,
+   SponsorBlock, 1Password, Refined GitHub, I still don't care about cookies, and
+   SteamDB are force-installed from their signed CRX URLs through an Aster-only
+   machine policy. The CRX payloads are fetched after launch rather than stored
+   in the RPM.
 
 ## Where things live
 
@@ -39,6 +44,8 @@ general-purpose distribution.
 - `downloads.ini` — extended with `[ublock]` and `[sidebery]` sections so both
   extensions are fetched into `third_party/` at build time, which is what lets the
   `bundle-*.patch` files bake them into the binary.
+- `assets/aster/policies/` — the Aster-only managed policy used to fetch the
+  remaining extensions on first launch.
 - `build.sh` + `scripts/` — a one-shot, containerized build producing an `.rpm` in
   the repo root. See "Building" below.
 

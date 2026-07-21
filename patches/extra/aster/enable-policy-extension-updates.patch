@@ -1,0 +1,23 @@
+## ungoogled-chromium also domain-substitutes the Omaha XML namespace used by
+## extension update manifests. The safe_manifest_parser files are deliberately
+## excluded from domain_substitution.list so genuine update manifests remain
+## parseable; this patch restores fetching only for machine-policy downloads.
+
+--- a/extensions/browser/updater/extension_downloader.cc
++++ b/extensions/browser/updater/extension_downloader.cc
+@@ -347,6 +347,15 @@ void ExtensionDownloader::DoStartAllPend
+     AddToFetches(fetches_preparing, std::move(task));
+   pending_tasks_.clear();
+ 
++  // aster: Keep unrequested extension update traffic disabled, but allow
++  // extensions explicitly required by Aster's local machine policy to be
++  // downloaded and kept current.
++  for (auto& fetch_list : fetches_preparing) {
++    for (auto& fetch : fetch_list.second) {
++      if (fetch->is_all_external_policy_download())
++        StartUpdateCheck(std::move(fetch));
++    }
++  }
+ }
+ 
+ void ExtensionDownloader::SetIdentityManager(
