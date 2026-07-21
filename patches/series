@@ -108,6 +108,7 @@ extra/ungoogled-chromium/disable-ai-search-shortcuts.patch
 extra/ungoogled-chromium/disable-fedcm-by-default.patch
 extra/ungoogled-chromium/bundle-hyphenation-patterns.patch
 extra/ungoogled-chromium/add-flag-for-disabling-jit.patch
+extra/aster/set-default-flags.patch
 extra/aster/always-restore-session-after-crash.patch
 extra/aster/hide-native-tab-strip.patch
 extra/aster/integrate-side-panel-ui.patch

@@ -1,0 +1,42 @@
+--- a/components/webui/flags/pref_service_flags_storage.cc
++++ b/components/webui/flags/pref_service_flags_storage.cc
+@@ -15,6 +15,21 @@
+ 
+ namespace flags_ui {
+ 
++namespace {
++
++std::set<std::string> GetAsterDefaultFlags() {
++  return {
++      "extension-mime-request-handling@2",
++      "show-avatar-button@3",
++      "bookmark-bar-ntp@1",
++      "clear-data-on-exit@2",
++      "start-maximized",
++      "ignore-gpu-blocklist",
++  };
++}
++
++}  // namespace
++
+ PrefServiceFlagsStorage::PrefServiceFlagsStorage(PrefService* prefs)
+     : prefs_(prefs) {}
+ 
+@@ -30,6 +45,17 @@ std::set<std::string> PrefServiceFlagsSt
+       continue;
+     }
+     flags.insert(entry.GetString());
+   }
++  for (const std::string& default_flag : GetAsterDefaultFlags()) {
++    const std::string internal_name =
++        default_flag.substr(0, default_flag.find('@'));
++    std::erase_if(flags, [&internal_name](const std::string& flag) {
++      return flag == internal_name ||
++             (flag.size() > internal_name.size() &&
++              flag.compare(0, internal_name.size(), internal_name) == 0 &&
++              flag[internal_name.size()] == '@');
++    });
++    flags.insert(default_flag);
++  }
+   return flags;
+ }
