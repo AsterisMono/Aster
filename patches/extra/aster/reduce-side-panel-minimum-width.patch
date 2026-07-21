@@ -7,7 +7,7 @@
 -  static constexpr int kSidePanelDefaultContentWidth = 360;
 +  // aster: Allow the always-open vertical-tabs sidebar to be narrowed while
 +  // retaining enough room for Sidebery's compact tab UI.
-+  static constexpr int kSidePanelDefaultContentWidth = 240;
++  static constexpr int kSidePanelDefaultContentWidth = 280;
    using CreateContentCallback =
        base::RepeatingCallback<SidePanelNativeView(SidePanelEntryScope&)>;
    using Id = SidePanelEntryId;
