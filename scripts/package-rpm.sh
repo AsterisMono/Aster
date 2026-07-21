@@ -110,6 +110,13 @@ mkdir -p "$STAGE/etc/aster/policies/managed"
 cp "$EXTENSION_POLICY_SOURCE" \
   "$STAGE/etc/aster/policies/managed/aster-extensions.json"
 
+NATIVE_MESSAGING_HOST_SOURCE="$REPO_ROOT/assets/aster/native-messaging-hosts/com.1password.1password.json"
+[ -f "$NATIVE_MESSAGING_HOST_SOURCE" ] \
+  || die "required native-messaging host manifest is missing: $NATIVE_MESSAGING_HOST_SOURCE"
+mkdir -p "$STAGE/etc/chromium/native-messaging-hosts"
+cp "$NATIVE_MESSAGING_HOST_SOURCE" \
+  "$STAGE/etc/chromium/native-messaging-hosts/com.1password.1password.json"
+
 chmod 4755 "$DEST/chrome-sandbox"
 
 mkdir -p "$STAGE/usr/bin" \
@@ -180,6 +187,7 @@ $PREFIX
 /usr/share/applications/$PKG_NAME.desktop
 /usr/share/icons/hicolor/*/apps/$PKG_NAME.png
 /etc/aster/policies/managed/aster-extensions.json
+/etc/chromium/native-messaging-hosts/com.1password.1password.json
 EOF
 
 cat >> "$SPEC" <<EOF
