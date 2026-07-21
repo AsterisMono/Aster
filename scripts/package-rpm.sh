@@ -106,36 +106,38 @@ done
 chmod 4755 "$DEST/chrome-sandbox"
 
 mkdir -p "$STAGE/usr/bin" \
-             "$STAGE/usr/share/applications" \
-             "$STAGE/usr/share/icons/hicolor/48x48/apps"
+             "$STAGE/usr/share/applications"
 
 cat > "$STAGE/usr/bin/$PKG_NAME" <<EOF
 #!/bin/sh
+export CHROME_WRAPPER="\$(readlink -f "\$0")"
+export CHROME_DESKTOP="$PKG_NAME.desktop"
 exec $PREFIX/chrome --user-data-dir="\${XDG_CONFIG_HOME:-\$HOME/.config}/$PKG_NAME" "\$@"
 EOF
 chmod 755 "$STAGE/usr/bin/$PKG_NAME"
 
-ICON_SOURCE="$BUILD_OUT/installer/theme/product_logo_48.png"
-if [ ! -f "$ICON_SOURCE" ]; then
-  ICON_SOURCE="$BUILD_OUT/product_logo_48.png"
-fi
-if [ -f "$ICON_SOURCE" ]; then
-  cp "$ICON_SOURCE" "$STAGE/usr/share/icons/hicolor/48x48/apps/$PKG_NAME.png"
-fi
+ICON_ROOT="$REPO_ROOT/assets/aster/icons"
+ICON_SIZES=(16 24 32 48 64 128 256 512)
+for size in "${ICON_SIZES[@]}"; do
+  icon_source="$ICON_ROOT/$size.png"
+  [ -f "$icon_source" ] || die "required Aster icon is missing: $icon_source"
+  icon_dir="$STAGE/usr/share/icons/hicolor/${size}x${size}/apps"
+  mkdir -p "$icon_dir"
+  cp "$icon_source" "$icon_dir/$PKG_NAME.png"
+done
 
-cat > "$STAGE/usr/share/applications/$PKG_NAME.desktop" <<EOF
-[Desktop Entry]
-Name=Aster
-GenericName=Web Browser
-Comment=Browse the Web
-Exec=/usr/bin/$PKG_NAME %U
-Terminal=false
-Type=Application
-Icon=$PKG_NAME
-Categories=Network;WebBrowser;
-MimeType=text/html;x-scheme-handler/http;x-scheme-handler/https;
-StartupNotify=true
-EOF
+DESKTOP_TEMPLATE="$BUILD_OUT/installer/common/desktop.template"
+[ -f "$DESKTOP_TEMPLATE" ] \
+  || die "required Chromium desktop template is missing: $DESKTOP_TEMPLATE"
+sed -e "s|@@MENUNAME|Aster|g" \
+    -e "s|@@PACKAGE|$PKG_NAME|g" \
+    -e "s|@@usr_bin_symlink_name|$PKG_NAME|g" \
+    -e "s|@@uri_scheme||g" \
+    -e "s|@@extra_desktop_entries|StartupWMClass=Aster|g" \
+    "$DESKTOP_TEMPLATE" > "$STAGE/usr/share/applications/$PKG_NAME.desktop"
+if grep -q '@@' "$STAGE/usr/share/applications/$PKG_NAME.desktop"; then
+  die "unresolved placeholder in $PKG_NAME.desktop"
+fi
 
 mkdir -p "$TOP"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
 SPEC="$TOP/SPECS/$PKG_NAME.spec"
@@ -168,11 +170,8 @@ cp -a $STAGE/. %{buildroot}/
 $PREFIX
 /usr/bin/$PKG_NAME
 /usr/share/applications/$PKG_NAME.desktop
+/usr/share/icons/hicolor/*/apps/$PKG_NAME.png
 EOF
-
-if [ -f "$STAGE/usr/share/icons/hicolor/48x48/apps/$PKG_NAME.png" ]; then
-  printf '%s\n' "/usr/share/icons/hicolor/48x48/apps/$PKG_NAME.png" >> "$SPEC"
-fi
 
 cat >> "$SPEC" <<EOF
 
