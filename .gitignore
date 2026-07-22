@@ -14,3 +14,14 @@ __pycache__/
 
 # Built packages
 *.rpm
+
+# Devenv
+.devenv*
+devenv.local.nix
+devenv.local.yaml
+
+# direnv
+.direnv
+
+# pre-commit
+.pre-commit-config.yaml

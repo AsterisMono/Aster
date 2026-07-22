@@ -1,0 +1,77 @@
+{ pkgs, ... }:
+
+{
+  env.LIBRARY_PATH = "${pkgs.gcc.cc}/lib";
+  env.LDFLAGS = "-Wl,--dynamic-linker=${pkgs.glibc}/lib/ld-linux-x86-64.so.2";
+
+  packages = with pkgs; [
+    autoconf
+    binutils
+    bison
+    gcc
+    bzip2
+    openssl
+    cpio
+    curl
+    dpkg
+    elfutils
+    file
+    flex
+    git
+    gperf
+    lsb-release
+    mesa
+    ninja
+    p7zip
+    patch
+    perl
+    pkg-config
+    python312
+    virtualenv
+    rpm
+    unzip
+    xz
+    zip
+    zstd
+    libuuid
+    alsa-lib
+    at-spi2-core
+    brltty
+    bzip2
+    cairo
+    libcap
+    cups
+    libdrm
+    libevdev
+    libffi
+    glib
+    glibc
+    glibc.static
+    gpp
+    libGLU
+    gtk3
+    libinput
+    krb5
+    nspr
+    nss
+    pam
+    nodejs_24
+    typescript
+    pciutils
+    libpulseaudio
+    lksctp-tools
+    speechd
+    sqlite
+    systemd
+    udev
+    libva
+    vulkan-loader
+    vulkan-headers
+    perlPackages.LWP
+    libxshmfence
+    libxslt
+    libxscrnsaver
+    libxt
+    libxtst
+  ];
+}
