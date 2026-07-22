@@ -1,4 +1,7 @@
-# Aster
+# <img width="28" height="28" alt="256" src="https://github.com/user-attachments/assets/0696078d-fa3f-4d56-88a9-ab59779e2910" /> Aster
+
+
+<img width="3536" height="2388" alt="image" src="https://github.com/user-attachments/assets/af62595f-53a6-42fd-8cfa-85dec6b97469" />
 
 > [!NOTE]
 > **Aster** is a [Noa-flavored](https://github.com/AsterisMono) ungoogled-chromium build with always-on vertical tabs
