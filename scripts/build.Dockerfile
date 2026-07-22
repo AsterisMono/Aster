@@ -1,6 +1,12 @@
+FROM node:24.12.0-bookworm-slim AS node
+
+RUN npm install -g typescript
+
 FROM debian:bookworm-slim
 
 ENV DEBIAN_FRONTEND=noninteractive
+
+COPY --from=node /usr/local /usr/local
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \

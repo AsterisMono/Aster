@@ -77,7 +77,6 @@ prepare_source() {
       && [ "$(chromium_tree_version "$SRC/chrome/VERSION")" = "$EXPECTED_VERSION" ] \
       && [ -f "$SRC/third_party/ublock/manifest.json" ] \
       && [ -f "$SRC/third_party/sidebery/manifest.json" ] \
-      && [ -x "$SRC/third_party/node/linux/node-linux-x64/bin/node" ] \
       && [ -x "$SRC/third_party/llvm-build/Release+Asserts/bin/clang" ] \
       && [ -x "$SRC/third_party/rust-toolchain/bin/rustc" ] \
       && [ -f "$SRC/build/linux/debian_bullseye_amd64-sysroot/.stamp" ]; then
@@ -115,8 +114,6 @@ prepare_source() {
 
     # Fetch these while their source URLs are still pristine. Domain
     # substitution deliberately rewrites Google hostnames in the source tree.
-    install_node
-
     log "Installing Chromium clang toolchain"
     (cd "$SRC" && python3 tools/clang/scripts/update.py)
 
@@ -140,81 +137,21 @@ prepare_source() {
   fi
 }
 
-install_node() {
-  local version_file="$SRC/third_party/node/update_node_binaries"
-  local node_version object_name archive_name archive_path expected_checksum metadata
-  local node_root node_binary temp_root
-
-  [ -f "$version_file" ] || die "Chromium Node version file is missing"
-  node_version="$(sed -n 's/^NODE_VERSION="\([^"]*\)"/\1/p' "$version_file")"
-  [ -n "$node_version" ] || die "could not determine Chromium's required Node version"
-
-  node_root="$SRC/third_party/node/linux/node-linux-x64"
-  node_binary="$node_root/bin/node"
-  if [ -x "$node_binary" ] && [ "$("$node_binary" --version)" = "$node_version" ]; then
-    log "Node $node_version is already installed"
-    return
-  fi
-
-  log "Installing Chromium's exact Node version ($node_version)"
-  metadata="$(python3 - "$SRC/DEPS" <<'PY'
-import re
-import sys
-
-contents = open(sys.argv[1], encoding='utf-8').read()
-start = contents.index("'src/third_party/node/linux':")
-end = contents.index("'src/third_party/node/mac':", start)
-block = contents[start:end]
-
-def value(key):
-    match = re.search(rf"'{key}':\s*'([^']+)'", block)
-    if not match:
-        raise SystemExit(f'missing {key} in Linux Node DEPS block')
-    return match.group(1)
-
-print(value('object_name'), value('sha256sum'), value('output_file'), sep='\t')
-PY
-)"
-  IFS=$'\t' read -r object_name expected_checksum archive_name <<< "$metadata"
-  [ -n "$object_name" ] && [ -n "$expected_checksum" ] && [ -n "$archive_name" ] \
-    || die "could not read Linux Node archive metadata from Chromium DEPS"
-  archive_path="$CACHE/$object_name-$archive_name"
-
-  if [ ! -f "$archive_path" ] \
-      || ! printf '%s  %s\n' "$expected_checksum" "$archive_path" | sha256sum --check --status; then
-    curl --fail --location --retry 3 \
-      "https://storage.googleapis.com/chromium-nodejs/$object_name" \
-      --output "$archive_path.tmp"
-    printf '%s  %s\n' "$expected_checksum" "$archive_path.tmp" | sha256sum --check --status \
-      || die "Node archive checksum mismatch"
-    mv -f "$archive_path.tmp" "$archive_path"
-  fi
-
-  mkdir -p "$(dirname "$node_root")"
-  temp_root="$SRC/third_party/node/linux/.aster-node-$node_version.tmp"
-  rm -rf -- "$temp_root"
-  mkdir -p "$temp_root"
-  tar -xzf "$archive_path" -C "$temp_root" --no-same-owner --strip-components=1 \
-    "node-linux-x64/bin/node"
-  rm -rf -- "$node_root"
-  mv "$temp_root" "$node_root"
-
-  [ "$("$node_binary" --version)" = "$node_version" ] \
-    || die "installed Node binary does not report $node_version"
-}
-
 install_system_build_tools() {
-  local gperf_path gperf_link
+  local gperf_path gperf_link node_path node_link
 
-  gperf_path="$(command -v gperf)" || die "system gperf is missing from the build image"
+  gperf_path="$(command -v gperf)" || die "system gperf is missing from the build environment"
   gperf_link="$SRC/third_party/gperf/cipd/bin/gperf"
 
-  # Chromium 150 hard-codes its CIPD gperf path in Blink's GN files, while
-  # ungoogled-chromium deliberately prunes that binary. Supply the container's
-  # packaged gperf at the expected path without retaining the bundled binary.
   mkdir -p "$(dirname "$gperf_link")"
   ln -sfn "$gperf_path" "$gperf_link"
   [ -x "$gperf_link" ] || die "could not expose system gperf to Chromium"
+
+  node_path="$(command -v node)" || die "system node is missing from the build environment"
+  node_link="$SRC/third_party/node/linux/node-linux-x64/bin/node"
+  mkdir -p "$(dirname "$node_link")"
+  ln -sfn "$node_path" "$node_link"
+  [ -x "$node_link" ] || die "could not expose system node to Chromium"
 }
 
 prepare_source
