@@ -15,7 +15,7 @@
      SessionCrashedBubble::ShowIfNotOffTheRecordProfile(
 --- a/chrome/browser/ui/startup/startup_browser_creator_impl.cc
 +++ b/chrome/browser/ui/startup/startup_browser_creator_impl.cc
-@@ -457,6 +457,17 @@ void StartupBrowserCreatorImpl::Determin
+@@ -459,6 +459,17 @@ void StartupBrowserCreatorImpl::Determin
    const bool is_incognito_or_guest = profile_->IsOffTheRecord();
    bool is_post_crash_launch = HasPendingUncleanExit(profile_);
  

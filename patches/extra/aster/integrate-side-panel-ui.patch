@@ -1,6 +1,6 @@
 --- a/chrome/browser/ui/side_panel/side_panel_prefs.cc
 +++ b/chrome/browser/ui/side_panel/side_panel_prefs.cc
-@@ -29,8 +29,10 @@ void RegisterProfilePrefs(user_prefs::Pr
+@@ -28,8 +28,10 @@ void RegisterProfilePrefs(user_prefs::Pr
    // Otherwise, the side panel should default to the right side of the screen.
    // TODO(dljames): Add enum values kAlternateSide / kDefaultSide that will
    // replace false and true respectively.
@@ -14,7 +14,7 @@
  
 --- a/chrome/browser/ui/views/side_panel/side_panel.cc
 +++ b/chrome/browser/ui/views/side_panel/side_panel.cc
-@@ -81,9 +81,10 @@ constexpr int kOverlapFromToolbar = 4;
+@@ -84,9 +84,10 @@ constexpr int kOverlapFromToolbar = 4;
  // bookmarks bar) itself. Subtract both of those to not get visually-excessive
  // padding.
  gfx::Insets GetBorderInsets() {
@@ -28,7 +28,7 @@
  }
  
  SidePanel::HorizontalAlignment GetHorizontalAlignment(
-@@ -218,12 +219,9 @@ class ContentParentView : public views::
+@@ -221,12 +222,9 @@ class ContentParentView : public views::
    }
  
    gfx::RoundedCornersF GetRoundedCorners() {
@@ -46,7 +46,7 @@
    const raw_ptr<BrowserView> browser_view_;
 --- a/chrome/browser/ui/views/side_panel/side_panel_coordinator.cc
 +++ b/chrome/browser/ui/views/side_panel/side_panel_coordinator.cc
-@@ -261,13 +261,10 @@ void SidePanelCoordinator::PopulateSideP
+@@ -264,13 +264,10 @@ void SidePanelCoordinator::PopulateSideP
  
    side_panel->UpdateHorizontalAlignment(entry->key().id());
  
@@ -66,7 +66,7 @@
    // |content_wrapper| should have either no child views or one child view for
 --- a/chrome/browser/ui/views/frame/layout/browser_view_tabbed_layout_impl.cc
 +++ b/chrome/browser/ui/views/frame/layout/browser_view_tabbed_layout_impl.cc
-@@ -185,7 +185,10 @@ BrowserViewTabbedLayoutImpl::SeparatorIn
+@@ -189,7 +189,10 @@ BrowserViewTabbedLayoutImpl::SeparatorIn
  BrowserViewTabbedLayoutImpl::CalculateSeparatorInfo() const {
    SeparatorInfo info;
  
@@ -78,7 +78,7 @@
    const bool is_force_to_top =
        has_side_panel &&
        layout_data_->horizontal_layout.force_top_container_to_top;
-@@ -226,6 +229,10 @@ BrowserViewTabbedLayoutImpl::CalculateSe
+@@ -230,6 +233,10 @@ BrowserViewTabbedLayoutImpl::CalculateSe
        break;
    }
  

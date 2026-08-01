@@ -122,3 +122,4 @@ extra/helium/add-component-managed-schema-support.patch
 extra/helium/fix-empty-component-resource.patch
 extra/aster/bundle-component-extensions.patch
 extra/aster/auto-open-sidebery-side-panel.patch
+extra/aster/zzzz-missing-dependencies-backport-aster-delete-me-after-chromium-includes-crrev-1655184.patch

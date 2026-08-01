@@ -79,6 +79,7 @@ prepare_source() {
       && [ -f "$SRC/third_party/sidebery/manifest.json" ] \
       && [ -x "$SRC/third_party/llvm-build/Release+Asserts/bin/clang" ] \
       && [ -x "$SRC/third_party/rust-toolchain/bin/rustc" ] \
+      && [ -x "$SRC/third_party/dawn/tools/golang/linux-amd64/bin/go" ] \
       && [ -f "$SRC/build/linux/debian_bullseye_amd64-sysroot/.stamp" ]; then
     SOURCE_READY=1
   fi
@@ -119,6 +120,18 @@ prepare_source() {
 
     log "Installing Chromium Rust toolchain"
     (cd "$SRC" && python3 tools/rust/update_rust.py)
+
+    DAWN_GO_VERSION="$(sed -n \
+      "s/^[[:space:]]*'dawn_go_version': '\([^']*\)',/\1/p" \
+      "$SRC/third_party/dawn/DEPS")"
+    [ -n "$DAWN_GO_VERSION" ] || die "Dawn Go version is missing from third_party/dawn/DEPS"
+
+    log "Installing Dawn Go toolchain $DAWN_GO_VERSION"
+    "$SRC/third_party/depot_tools/cipd" install \
+      infra/3pp/tools/go/linux-amd64 "$DAWN_GO_VERSION" \
+      -root "$SRC/third_party/dawn/tools/golang/linux-amd64"
+    [ -x "$SRC/third_party/dawn/tools/golang/linux-amd64/bin/go" ] \
+      || die "Dawn Go toolchain installation is incomplete"
 
     log "Installing Chromium amd64 sysroot"
     (cd "$SRC" && python3 build/linux/sysroot_scripts/install-sysroot.py --arch=amd64)

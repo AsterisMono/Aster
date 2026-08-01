@@ -2,7 +2,7 @@ diff --git a/chrome/browser/extensions/BUILD.gn b/chrome/browser/extensions/BUIL
 index 9f282ef..b7edfe7 100644
 --- a/chrome/browser/extensions/BUILD.gn
 +++ b/chrome/browser/extensions/BUILD.gn
-@@ -627,6 +627,8 @@ source_set("extensions") {
+@@ -640,6 +640,8 @@ source_set("extensions") {
      "//net:extras",
      "//services/metrics/public/cpp:ukm_builders",
      "//storage/browser",
@@ -15,8 +15,8 @@ diff --git a/chrome/browser/extensions/chrome_component_extension_resource_manag
 index a5ccd45..5a62311 100644
 --- a/chrome/browser/extensions/chrome_component_extension_resource_manager.cc
 +++ b/chrome/browser/extensions/chrome_component_extension_resource_manager.cc
-@@ -20,6 +20,8 @@
- #include "chrome/common/extensions/extension_constants.h"
+@@ -21,6 +21,8 @@
+ #include "chrome/grit/aim_eligibility_extension_resources_map.h"
  #include "chrome/grit/chrome_unscaled_resources.h"
  #include "chrome/grit/component_extension_resources_map.h"
 +#include "third_party/sidebery/resources/grit/sidebery_resources_map.h"
@@ -24,10 +24,11 @@ index a5ccd45..5a62311 100644
  #include "chrome/grit/theme_resources.h"
  #include "content/public/browser/browser_thread.h"
  #include "extensions/buildflags/buildflags.h"
-@@ -101,6 +103,8 @@ ChromeComponentExtensionResourceManager::Data::Data() {
+@@ -102,7 +104,9 @@ ChromeComponentExtensionResourceManager::Data::Data() {
  
    AddComponentResourceEntries(kComponentExtensionResources);
    AddComponentResourceEntries(kExtraComponentExtensionResources);
+   AddComponentResourceEntries(kAimEligibilityExtensionResources);
 +  AddComponentResourceEntries(kUblockResources);
 +  AddComponentResourceEntries(kSideberyResources);
  
@@ -37,8 +38,8 @@ diff --git a/chrome/browser/extensions/component_extensions_allowlist/allowlist.
 index 0de1e4a..c01697c 100644
 --- a/chrome/browser/extensions/component_extensions_allowlist/allowlist.cc
 +++ b/chrome/browser/extensions/component_extensions_allowlist/allowlist.cc
-@@ -16,6 +16,8 @@
- #include "chrome/common/extensions/extension_constants.h"
+@@ -17,6 +17,8 @@
+ #include "chrome/grit/aim_eligibility_extension_resources.h"
  #include "chrome/grit/browser_resources.h"
  #include "chrome/grit/component_extension_resources.h"
 +#include "third_party/sidebery/resources/grit/sidebery_resources.h"
@@ -46,7 +47,7 @@ index 0de1e4a..c01697c 100644
  #include "extensions/buildflags/buildflags.h"
  #include "extensions/common/constants.h"
  #include "printing/buildflags/buildflags.h"
-@@ -36,6 +38,10 @@ bool IsComponentExtensionAllowlisted(const std::string& extension_id) {
+@@ -38,6 +40,10 @@ bool IsComponentExtensionAllowlisted(const std::string& extension_id) {
        extension_misc::kContextualTasksExtensionId,
        extension_misc::kGlicExtensionId,
        extension_misc::kPdfExtensionId,
@@ -57,7 +58,7 @@ index 0de1e4a..c01697c 100644
  #if BUILDFLAG(IS_CHROMEOS)
        extension_misc::kAssessmentAssistantExtensionId,
        extension_misc::kAccessibilityCommonExtensionId,
-@@ -95,6 +101,10 @@ bool IsComponentExtensionAllowlisted(int manifest_resource_id) {
+@@ -100,6 +106,10 @@ bool IsComponentExtensionAllowlisted(int manifest_resource_id) {
      case IDR_NETWORK_SPEECH_SYNTHESIS_MANIFEST_MV3:
      case IDR_READING_MODE_GDOCS_HELPER_MANIFEST:
      case IDR_WEBSTORE_MANIFEST:
@@ -72,16 +73,16 @@ diff --git a/chrome/browser/extensions/component_loader.cc b/chrome/browser/exte
 index 4311881..612d979 100644
 --- a/chrome/browser/extensions/component_loader.cc
 +++ b/chrome/browser/extensions/component_loader.cc
-@@ -38,6 +38,8 @@
- #include "chrome/grit/browser_resources.h"
- #include "chrome/grit/component_extension_resources.h"
- #include "chrome/grit/generated_resources.h"
+@@ -60,6 +60,8 @@
+ #include "extensions/common/manifest_constants.h"
+ #include "pdf/buildflags.h"
+ #include "printing/buildflags/buildflags.h"
 +#include "third_party/sidebery/resources/grit/sidebery_resources.h"
 +#include "third_party/ublock/resources/grit/ublock_resources.h"
- #include "components/crx_file/id_util.h"
- #include "components/version_info/version_info.h"
- #include "content/public/browser/browser_thread.h"
-@@ -442,6 +444,46 @@ void ComponentLoader::AddWebStoreApp() {
+ #include "ui/accessibility/accessibility_features.h"
+ #include "ui/base/l10n/l10n_util.h"
+ #include "ui/base/resource/resource_bundle.h"
+@@ -454,6 +456,46 @@ void ComponentLoader::AddWebStoreApp() {
  #endif
  }
  
@@ -128,7 +129,7 @@ index 4311881..612d979 100644
  #if BUILDFLAG(IS_CHROMEOS)
  void ComponentLoader::AddChromeApp() {
    AddWithNameAndDescription(
-@@ -519,6 +561,8 @@ void ComponentLoader::AddDefaultComponentExtensions(
+@@ -531,6 +573,8 @@ void ComponentLoader::AddDefaultComponentExtensions(
  
    if (!skip_session_components) {
      AddWebStoreApp();
@@ -141,7 +142,7 @@ diff --git a/chrome/browser/extensions/component_loader.h b/chrome/browser/exten
 index b3a3f40..c9d3af4 100644
 --- a/chrome/browser/extensions/component_loader.h
 +++ b/chrome/browser/extensions/component_loader.h
-@@ -220,6 +220,10 @@ class ComponentLoader : public KeyedService {
+@@ -222,6 +222,10 @@ class ComponentLoader : public KeyedService {
                                   const std::string& name_string,
                                   const std::string& description_string);
    void AddWebStoreApp();
@@ -156,24 +157,24 @@ diff --git a/chrome/chrome_paks.gni b/chrome/chrome_paks.gni
 index a2462b2..ab6de80 100644
 --- a/chrome/chrome_paks.gni
 +++ b/chrome/chrome_paks.gni
-@@ -155,6 +155,8 @@ template("chrome_extra_paks") {
-       "$root_gen_dir/net/net_resources.pak",
+@@ -158,6 +158,8 @@ template("chrome_extra_paks") {
        "$root_gen_dir/third_party/blink/public/resources/blink_resources.pak",
        "$root_gen_dir/third_party/blink/public/resources/inspector_overlay_resources.pak",
-+      "$root_gen_dir/third_party/ublock/resources/ublock_resources.pak",
-+      "$root_gen_dir/third_party/sidebery/resources/sidebery_resources.pak",
        "$root_gen_dir/third_party/blink/public/strings/permission_element_generated_strings.pak",
++      "$root_gen_dir/third_party/sidebery/resources/sidebery_resources.pak",
++      "$root_gen_dir/third_party/ublock/resources/ublock_resources.pak",
        "$root_gen_dir/ui/resources/ui_lottie_resources.pak",
        "$root_gen_dir/ui/webui/resources/webui_resources.pak",
-@@ -184,6 +186,8 @@ template("chrome_extra_paks") {
-       "//net:net_resources",
+     ]
+@@ -188,6 +190,8 @@ template("chrome_extra_paks") {
        "//third_party/blink/public:devtools_inspector_resources",
        "//third_party/blink/public:resources",
-+      "//third_party/ublock",
-+      "//third_party/sidebery",
        "//third_party/blink/public/strings:permission_element_generated_strings",
++      "//third_party/sidebery",
++      "//third_party/ublock",
        "//ui/resources:ui_lottie_resources_grd",
        "//ui/webui/resources",
+     ]
 diff --git a/third_party/sidebery/BUILD.gn b/third_party/sidebery/BUILD.gn
 new file mode 100644
 index 0000000..8462faa
@@ -412,15 +413,15 @@ diff --git a/tools/gritsettings/resource_ids.spec b/tools/gritsettings/resource_
 index 9d8b4ad..1a50620 100644
 --- a/tools/gritsettings/resource_ids.spec
 +++ b/tools/gritsettings/resource_ids.spec
-@@ -1783,6 +1783,18 @@
-     "messages": [10120],
+@@ -1802,6 +1802,18 @@
+     "includes": [10140],
    },
  
 +  # aster: bundled component extensions. If grit reports these
 +  # ranges as too small or overlapping, adjust the "sizes"/start ids here.
 +  "<(SHARED_INTERMEDIATE_DIR)/third_party/ublock/ublock_resources.grd": {
 +    "META": {"sizes": {"includes": [1000]}},
-+    "includes": [10140],
++    "includes": [10160],
 +  },
 +
 +  "<(SHARED_INTERMEDIATE_DIR)/third_party/sidebery/sidebery_resources.grd": {
