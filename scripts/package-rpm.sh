@@ -143,11 +143,16 @@ done
 DESKTOP_TEMPLATE="$BUILD_OUT/installer/common/desktop.template"
 [ -f "$DESKTOP_TEMPLATE" ] \
   || die "required Chromium desktop template is missing: $DESKTOP_TEMPLATE"
+DESKTOP_EXTRA_ENTRIES="StartupWMClass=Aster"
+if grep -q '@@startup_wm_class' "$DESKTOP_TEMPLATE"; then
+  DESKTOP_EXTRA_ENTRIES=""
+fi
 sed -e "s|@@MENUNAME|Aster|g" \
     -e "s|@@PACKAGE|$PKG_NAME|g" \
     -e "s|@@usr_bin_symlink_name|$PKG_NAME|g" \
+    -e "s|@@startup_wm_class|Aster|g" \
     -e "s|@@uri_scheme||g" \
-    -e "s|@@extra_desktop_entries|StartupWMClass=Aster|g" \
+    -e "s|@@extra_desktop_entries|$DESKTOP_EXTRA_ENTRIES|g" \
     "$DESKTOP_TEMPLATE" > "$STAGE/usr/share/applications/$PKG_NAME.desktop"
 if grep -q '@@' "$STAGE/usr/share/applications/$PKG_NAME.desktop"; then
   die "unresolved placeholder in $PKG_NAME.desktop"
